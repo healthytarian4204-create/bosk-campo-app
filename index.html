@@ -77,6 +77,14 @@ form { display: flex; flex-direction: column; gap: 16px; }
 .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .field > span, .flabel { font-weight: 700; font-size: .95rem; }
 .hint { font-size: .85rem; color: var(--muted); font-weight: 400; }
+.arr h3 { font-family: var(--f-display); font-size: 1.15rem; margin: 0; }
+.arr .blk { display: flex; flex-direction: column; gap: 4px; }
+.arr .blk + .blk { border-top: 1px solid var(--line); padding-top: 12px; }
+.arr ul { margin: 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: 6px; }
+.arr li { overflow-wrap: anywhere; }
+.arr .bar { height: 6px; border-radius: 99px; background: var(--soft); overflow: hidden; margin-top: 4px; }
+.arr .bar i { display: block; height: 100%; background: var(--moss); }
+.arr pre { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; font-size: .92rem; margin: 0; padding: 10px 12px; border-radius: 10px; background: var(--soft); }
 input, select, textarea { font: inherit; color: var(--ink); background: var(--bg); border: 1.5px solid var(--line); border-radius: 10px; padding: 11px 12px; min-height: 50px; width: 100%; box-sizing: border-box; }
 textarea { min-height: 96px; resize: vertical; }
 input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
@@ -169,6 +177,7 @@ img { max-width: 100%; }
       <button class="qbtn" type="button" data-go="pendiente"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>Anotar pendiente</button>
       <button class="qbtn" type="button" data-go="cuadrilla"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 19c.8-3.4 3.2-5 6-5s5.2 1.6 6 5"/><path d="M15.5 14.2c2.3-.3 4.4 1 5.2 4"/></svg>Pasar lista</button>
     </div>
+    <div class="card arr" id="hoy-arr" hidden></div>
     <div class="card" id="hoy-pend" aria-live="polite"><p class="empty">Cargando pendientes…</p></div>
     <div class="card">
       <div class="label">En espera de pasar a los tableros</div>
@@ -364,6 +373,8 @@ img { max-width: 100%; }
       const want = (tree.tree || []).filter(n => n.type === 'blob' && (/^pendientes\/.+\.json$/.test(n.path) || /^cuadrilla\.json$/.test(n.path) || /^revision\.json$/.test(n.path) ||
         (/^asistencia\/(semana-)?\d{4}-\d{2}-\d{2}.*\.json$/.test(n.path) && n.path.replace(/^asistencia\/(semana-)?/, '').slice(0, 10).replace(/-/g, '') >= limite) ||
         (/^gastos\/g-(\d{8}).*\.json$/.test(n.path) && n.path.slice(9, 17) >= limite)));
+      const arr = (tree.tree || []).filter(n => n.type === 'blob' && /^arranque\/\d{4}-\d{2}-\d{2}\.json$/.test(n.path)).sort((a, b) => a.path < b.path ? 1 : -1)[0];
+      if (arr) want.push(arr);
       const keep = {};
       for (const n of want) {
         if (CACHE[n.path] && CACHE[n.path].sha === n.sha) { keep[n.path] = CACHE[n.path]; continue; }
@@ -380,6 +391,8 @@ img { max-width: 100%; }
     S.asis = v.filter(([p]) => p.startsWith('asistencia/')).map(([, x]) => x.data);
     S.crew = (CACHE['cuadrilla.json'] && CACHE['cuadrilla.json'].data.personas) || [];
     S.revision = CACHE['revision.json'] && CACHE['revision.json'].data;
+    const ak = Object.keys(CACHE).filter(p => p.startsWith('arranque/')).sort().pop();
+    S.arranque = ak ? CACHE[ak].data : null;
   }
 
   // ---------- cola sin señal (IndexedDB en este celular) ----------
@@ -471,7 +484,40 @@ img { max-width: 100%; }
     const upd = {}; S.queue.filter(i => i.tipo === 'merge' && i.path.startsWith('pendientes/')).forEach(i => { const id = i.path.slice(11, -5); upd[id] = Object.assign(upd[id] || {}, i.data); });
     return S.pend.filter(p => !ids.has(p.id)).concat(q).map(p => upd[p.id] ? Object.assign({}, p, upd[p.id], { _cola: true }) : p);
   }
+  function renderArranque() {
+    const a = S.arranque, box = $('#hoy-arr');
+    if (!a || !a.fecha) { box.hidden = true; return; }
+    const kids = [];
+    const f = new Date(a.fecha + 'T12:00:00-06:00');
+    kids.push(el('div', { class: 'blk' }, el('div', { class: 'label' }, 'Arranque de semana · ' + (a.obra || '')),
+      el('h3', {}, [a.semana, a.periodo].filter(Boolean).join(' · ') || ('Semana del ' + fDia.format(f)))));
+    const acts = Array.isArray(a.actividades) ? a.actividades : [];
+    if (acts.length) kids.push(el('div', { class: 'blk' }, el('div', { class: 'flabel' }, 'Cómo va la obra'),
+      ...acts.map(x => { const pct = typeof x.avance === 'number' ? Math.round(x.avance * 100) : null;
+        return el('div', {}, el('p', { style: 'margin:0' }, (x.estado === 'sigue' ? 'Sigue: ' : '') + (x.actividad || '') + (pct !== null && x.estado !== 'sigue' ? ' · ' + pct + '%' : '')),
+          x.nota ? el('p', { class: 'hint', style: 'margin:2px 0 0' }, x.nota) : '',
+          pct !== null && x.estado !== 'sigue' ? el('div', { class: 'bar', 'aria-hidden': 'true' }, el('i', { style: 'width:' + Math.max(0, Math.min(100, pct)) + '%' })) : ''); }),
+      a.ritmo ? el('p', { class: 'hint', style: 'margin:0' }, a.ritmo) : ''));
+    const rec = Array.isArray(a.recordatorios) ? a.recordatorios : [];
+    if (rec.length) kids.push(el('div', { class: 'blk' }, el('div', { class: 'flabel' }, 'Para planear o aclarar'),
+      el('ul', {}, ...rec.map(r => el('li', {}, r.tema ? el('b', {}, r.tema + ': ') : '', r.texto || '')))));
+    const c = a.cobro;
+    if (c && Array.isArray(c.conceptos) && c.conceptos.length) kids.push(el('div', { class: 'blk' }, el('div', { class: 'flabel' }, 'Cobro (borrador por revisar)'),
+      ...c.conceptos.map(x => el('div', { class: 'brow' }, el('span', {}, x.concepto || ''), el('span', { class: 'r' }, money(x.monto)))),
+      el('div', { class: 'brow' }, el('span', {}, el('b', {}, 'Total')), el('span', { class: 'r' }, money(c.total)))));
+    const pend = Array.isArray(a.pendientes) ? a.pendientes : [];
+    if (pend.length) kids.push(el('div', { class: 'blk' }, el('div', { class: 'flabel' }, 'Pendientes de la semana'),
+      el('ul', {}, ...pend.map(p => el('li', {}, (p.texto || '') + (p.recordar_en ? ' · ' + fDia.format(new Date(p.recordar_en)) : ''))))));
+    if (a.mensaje_whatsapp) {
+      const b = el('button', { type: 'button', class: 'btn ghost small', onclick: async () => {
+        try { await navigator.clipboard.writeText(a.mensaje_whatsapp); toast('Mensaje copiado.'); } catch (e) { toast('No se pudo copiar; selecciónalo a mano.'); } } }, 'Copiar mensaje para Mau');
+      kids.push(el('div', { class: 'blk' }, el('div', { class: 'flabel' }, 'Mensaje de WhatsApp'), el('pre', {}, a.mensaje_whatsapp), b));
+    }
+    if (a.creado) kids.push(el('p', { class: 'hint', style: 'margin:0' }, 'Lo armó Claude el ' + fDia.format(new Date(a.creado)) + ' · ' + fHora.format(new Date(a.creado))));
+    box.replaceChildren(...kids); box.hidden = false;
+  }
   function renderHoy() {
+    renderArranque();
     $('#hoy-fecha').textContent = cap(fLargo.format(new Date()));
     const rv = S.revision && S.revision.at ? new Date(S.revision.at) : null;
     $('#hoy-rev').textContent = rv ? 'Claude revisó por última vez ' + (dayKey(rv) === dayKey(new Date()) ? 'hoy a las ' + fHora.format(rv) : fDia.format(rv) + ' · ' + fHora.format(rv)) + '. Revisa cada hora de 6 a.m. a 10 p.m.' : 'Claude revisa cada hora de 6 a.m. a 10 p.m.';
