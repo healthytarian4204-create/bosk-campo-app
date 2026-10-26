@@ -1,0 +1,17 @@
+{
+  "name": "Bos.k Campo",
+  "short_name": "Bos.k Campo",
+  "description": "Gastos con foto de ticket, pendientes y lista de la cuadrilla de las obras de Bos.k.",
+  "lang": "es-MX",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F1EDE3",
+  "theme_color": "#1F3A24",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
