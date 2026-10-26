@@ -126,6 +126,19 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); ou
 .bigbtn:focus-visible, .back:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .back { align-self: flex-start; min-height: 44px; border: 0; background: none; color: var(--accent); font: inherit; font-weight: 700; cursor: pointer; padding: 0; }
 .preview h2 { font-size: 1.3rem; }
+.weekbar { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+.weekt { display: flex; flex-direction: column; text-align: center; min-width: 0; }
+.weekt b { font-family: var(--f-display); font-size: 1.15rem; }
+.cardh { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.linkbtn { border: 0; background: none; color: var(--accent); font: inherit; font-weight: 700; font-size: .9rem; cursor: pointer; padding: 6px 0; min-height: 36px; }
+.pname { display: flex; flex-direction: column; min-width: 0; }
+.stepper { display: inline-grid; grid-template-columns: 46px 5.2rem 46px; align-items: center; border: 1.5px solid var(--line); border-radius: 12px; overflow: hidden; }
+.stepper button { min-height: 46px; border: 0; background: var(--soft); color: var(--ink); font: inherit; font-size: 1.3rem; font-weight: 700; cursor: pointer; }
+.stepper .sval { text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; }
+.more summary { cursor: pointer; color: var(--accent); font-weight: 700; padding-top: 6px; min-height: 36px; }
+.row3 { display: grid; grid-template-columns: minmax(0, 1fr) 6.5rem auto; gap: 8px; margin-top: 8px; }
+.extraf { display: flex; flex-direction: column; gap: 8px; }
+.ibtn:disabled { opacity: .35; cursor: default; }
 @media (prefers-reduced-motion: no-preference) { .toast { animation: up .18s ease-out; } @keyframes up { from { transform: translate(-50%, 8px); opacity: 0; } } }
 @media (max-width: 360px) { .quick { grid-template-columns: 1fr; } .qbtn { min-height: 64px; flex-direction: row; align-items: center; justify-content: flex-start; } }
 
@@ -205,25 +218,37 @@ img { max-width: 100%; }
 
   <!-- CUADRILLA -->
   <section id="v-cuadrilla" aria-labelledby="h-cua" hidden style="flex-direction:column;gap:16px">
-    <div><h2 id="h-cua">Lista de la cuadrilla</h2><p class="sub">Marca quién vino hoy. El viernes la nómina ya sale de aquí.</p></div>
+    <div><h2 id="h-cua">Nómina de la semana</h2><p class="sub">Pon los días de cada quien, de preferencia el viernes. Puedes corregirla antes de pagar el sábado.</p></div>
     <div class="field"><span class="flabel">Obra</span><div class="chips" id="c-obra"></div></div>
-    <div class="row2">
-      <label class="field"><span>Día</span><input type="date" id="c-fecha"></label>
-      <label class="field" id="c-fase-f"><span>Fase</span><select id="c-fase"></select></label>
+    <div class="weekbar">
+      <button type="button" class="ibtn" id="c-prev" aria-label="Semana anterior">‹</button>
+      <div class="weekt"><b id="c-sem"></b><span class="hint" id="c-sem-sub"></span></div>
+      <button type="button" class="ibtn" id="c-next" aria-label="Semana siguiente">›</button>
     </div>
+    <label class="field" id="c-fase-f"><span>Fase</span><select id="c-fase"></select></label>
     <div class="card">
+      <div class="cardh"><span class="label">Cuadrilla</span><button type="button" class="linkbtn" id="c-todos">Todos 6 días</button></div>
       <div id="c-lista"></div>
-      <div class="addp"><input type="text" id="c-nuevo" placeholder="Agregar persona" autocomplete="off" aria-label="Nombre de la persona"><button type="button" class="btn ghost small" id="c-add">Agregar</button></div>
+      <details class="more"><summary>Agregar a la cuadrilla fija</summary>
+        <div class="row3"><input type="text" id="c-nuevo" placeholder="Nombre" autocomplete="off" aria-label="Nombre"><input type="text" inputmode="decimal" id="c-nuevo-t" placeholder="$ por día" aria-label="Pago por día"><button type="button" class="btn ghost small" id="c-add">Agregar</button></div>
+      </details>
     </div>
-    <div class="sum"><span id="c-sumtxt">Sin marcar</span><span class="tot" id="c-sum">$0.00</span></div>
-    <p class="status" id="c-status" role="status"></p>
-    <button class="btn" type="button" id="c-save">Guardar lista del día</button>
     <div class="card">
-      <div class="label" id="c-wk-t">Esta semana</div>
-      <div class="wk" id="c-wk"></div>
-      <p class="hint">Semana de lunes a sábado, $350 por jornada salvo que la persona tenga otra tarifa. Se paga el sábado en efectivo.</p>
+      <span class="label">Extras de la semana</span>
+      <p class="hint" style="margin:0">Alguien que fue por un día o para un trabajo específico.</p>
+      <div id="c-extras"></div>
+      <div class="extraf">
+        <input type="text" id="x-nombre" placeholder="Nombre" autocomplete="off" aria-label="Nombre del extra">
+        <input type="text" id="x-tarea" placeholder="Qué hizo" autocomplete="off" aria-label="Qué hizo">
+        <div class="row2"><input type="date" id="x-fecha" aria-label="Día"><input type="text" inputmode="decimal" id="x-monto" placeholder="$ pagado" aria-label="Cuánto se le pagó"></div>
+        <button type="button" class="btn ghost small" id="x-add">Agregar extra</button>
+      </div>
     </div>
+    <div class="sum"><span id="c-sumtxt">Sin días</span><span class="tot" id="c-sum">$0.00</span></div>
+    <p class="status" id="c-status" role="status"></p>
+    <button class="btn" type="button" id="c-save">Guardar nómina de la semana</button>
   </section>
+
   <!-- CONEXIÓN -->
   <section id="v-setup" aria-labelledby="h-setup" hidden style="flex-direction:column;gap:16px">
     <form id="s-form" novalidate>
@@ -337,7 +362,7 @@ img { max-width: 100%; }
       const tree = await gh('/git/trees/main?recursive=1');
       const limite = addDays(dayKey(new Date()), -45).replace(/-/g, '');
       const want = (tree.tree || []).filter(n => n.type === 'blob' && (/^pendientes\/.+\.json$/.test(n.path) || /^cuadrilla\.json$/.test(n.path) || /^revision\.json$/.test(n.path) ||
-        (/^asistencia\/(\d{4}-\d{2}-\d{2}).*\.json$/.test(n.path) && n.path.slice(11, 21).replace(/-/g, '') >= limite) ||
+        (/^asistencia\/(semana-)?\d{4}-\d{2}-\d{2}.*\.json$/.test(n.path) && n.path.replace(/^asistencia\/(semana-)?/, '').slice(0, 10).replace(/-/g, '') >= limite) ||
         (/^gastos\/g-(\d{8}).*\.json$/.test(n.path) && n.path.slice(9, 17) >= limite)));
       const keep = {};
       for (const n of want) {
@@ -418,7 +443,7 @@ img { max-width: 100%; }
     window.scrollTo(0, 0);
   }
   document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => show(b.dataset.go)));
-  function renderAll() { renderHoy(); if (!$('#v-cuadrilla').hidden) renderCuadrilla(); }
+  function renderAll() { renderHoy(); if (!$('#v-cuadrilla').hidden) { if (!C.touched) C.docKey = null; loadCuadrilla(); } }
 
   // ---------- conexión con GitHub (una sola vez) ----------
   function showSetup(msg) {
@@ -480,7 +505,7 @@ img { max-width: 100%; }
     if (!items.length) bb.replaceChildren(el('p', { class: 'empty' }, 'Nada en espera. Todo está en los tableros.'));
     else bb.replaceChildren(...items.slice(0, 8).map(x => x._tipo === 'gasto'
       ? el('div', { class: 'brow' }, el('span', null, (x.proveedor || 'Ticket ' + fDia.format(dateOnly(x.fecha))) + ' · ' + (x.obra || 'Bos.k interno') + ' ', el('span', { class: 'pill' + (x._cola ? ' off' : '') }, x._cola ? 'por enviar' : x.estado === 'procesando' ? 'registrando…' : 'en espera')), el('span', { class: 'r' }, x.total != null ? money(x.total) : ''))
-      : el('div', { class: 'brow' }, el('span', null, 'Lista ' + fDia.format(dateOnly(x.fecha)) + ' · ' + x.obra + ' ', el('span', { class: 'pill' + (x._cola ? ' off' : '') }, x._cola ? 'por enviar' : 'en espera')), el('span', { class: 'r' }, (x.total_jornadas || 0) + ' jorn.'))),
+      : el('div', { class: 'brow' }, el('span', null, (x.tipo === 'semana' ? 'Nómina semana del ' + fDia.format(dateOnly(x.semana_inicio)) : 'Lista ' + fDia.format(dateOnly(x.fecha))) + ' · ' + x.obra + ' ', el('span', { class: 'pill' + (x._cola ? ' off' : '') }, x._cola ? 'por enviar' : 'en espera')), el('span', { class: 'r' }, x.tipo === 'semana' ? money(x.total) : (x.total_jornadas || 0) + ' jorn.'))),
       items.length > 8 ? el('p', { class: 'hint' }, `y ${items.length - 8} más`) : '');
   }
   async function toggleDone(p) {
@@ -592,9 +617,10 @@ img { max-width: 100%; }
     show('hoy');
   });
 
-  // ---------- CUADRILLA ----------
-  const C = { obra: 'El Naranjal', marks: {}, docId: null };
-  const asisId = (fecha, obra) => fecha + '_' + slug(obra);
+  // ---------- CUADRILLA: captura semanal ----------
+  const C = { obra: 'El Naranjal', lunes: null, dias: {}, extras: [], docKey: null };
+  const lunesDe = f => { const dow = dateOnly(f).getUTCDay(); return addDays(f, -((dow + 6) % 7)); };
+  const semId = (lunes, obra) => 'semana-' + lunes + '_' + slug(obra);
   function asisDocs() {
     const q = S.queue.filter(i => i.tipo === 'json' && i.path.startsWith('asistencia/')).map(i => Object.assign({ _cola: true }, i.data));
     const ids = new Set(q.map(a => a.id)); return S.asis.filter(a => !ids.has(a.id)).concat(q);
@@ -603,61 +629,89 @@ img { max-width: 100%; }
     const q = S.queue.filter(i => i.tipo === 'json' && i.path === 'cuadrilla.json').pop();
     return q ? q.data.personas : S.crew;
   }
+  const tarifaDe = n => { const p = crewList().find(x => x.nombre === n); return p && p.tarifa ? +p.tarifa : TARIFA; };
   function crewFor(obra) {
     const names = crewList().filter(p => p.activo !== false && (p.obras || []).includes(obra)).map(p => p.nombre);
-    Object.keys(C.marks).forEach(n => { if (!names.includes(n)) names.push(n); });
+    Object.keys(C.dias).forEach(n => { if (!names.includes(n)) names.push(n); });
     return names.sort((a, b) => a.localeCompare(b, 'es'));
   }
-  const tarifaDe = n => { const p = crewList().find(x => x.nombre === n); return p && p.tarifa ? +p.tarifa : TARIFA; };
   function loadCuadrilla() {
-    if (!$('#c-fecha').value) $('#c-fecha').value = dayKey(new Date());
-    chips($('#c-obra'), OBRAS.map(o => [o, o]), () => C.obra, v => { if (!v) return; C.obra = v; C.docId = null; loadCuadrilla(); });
-    const id = asisId($('#c-fecha').value, C.obra);
-    if (C.docId !== id) {
-      const d = asisDocs().find(a => a.id === id);
-      C.marks = {}; (d && d.personas || []).forEach(p => C.marks[p.nombre] = p.jornada);
-      faseSelect($('#c-fase'), C.obra, d && d.fase); C.docId = id;
-      status('#c-status', d ? (d._cola ? 'Lista guardada en tu celular, por enviar.' : 'Esta lista ya estaba guardada; puedes corregirla.') : '');
+    if (!C.lunes) C.lunes = lunesDe(dayKey(new Date()));
+    chips($('#c-obra'), OBRAS.map(o => [o, o]), () => C.obra, v => { if (!v) return; C.obra = v; C.docKey = null; loadCuadrilla(); });
+    const key = semId(C.lunes, C.obra);
+    if (C.docKey !== key) {
+      C.docKey = key; C.dias = {}; C.extras = []; C.touched = false;
+      const docs = asisDocs(), sab = addDays(C.lunes, 5);
+      const sem = docs.find(a => a.id === key);
+      let fase = '';
+      if (sem) { (sem.personas || []).forEach(p => C.dias[p.nombre] = +p.dias); C.extras = (sem.extras || []).map(x => Object.assign({}, x)); fase = sem.fase; status('#c-status', sem._cola ? 'Guardada en tu celular, por enviar.' : 'Esta semana ya estaba guardada; puedes corregirla.'); }
+      else {
+        const diarias = docs.filter(a => a.tipo !== 'semana' && a.obra === C.obra && a.fecha >= C.lunes && a.fecha <= sab);
+        diarias.forEach(a => { fase = fase || a.fase; (a.personas || []).forEach(p => C.dias[p.nombre] = (C.dias[p.nombre] || 0) + +p.jornada); });
+        if (!diarias.length) crewFor(C.obra).forEach(n => C.dias[n] = 6);
+        status('#c-status', diarias.length ? 'Tomé los días de tus listas diarias de esta semana.' : '');
+      }
+      faseSelect($('#c-fase'), C.obra, fase);
+      $('#x-fecha').value = dayKey(new Date()) <= sab && dayKey(new Date()) >= C.lunes ? dayKey(new Date()) : C.lunes;
     }
+    const sab = addDays(C.lunes, 5), hoyLunes = lunesDe(dayKey(new Date()));
+    $('#c-sem').textContent = 'Semana del ' + fDia.format(dateOnly(C.lunes)) + ' al ' + fDia.format(dateOnly(sab));
+    $('#c-sem-sub').textContent = C.lunes === hoyLunes ? 'Esta semana · se paga el ' + fDia.format(dateOnly(sab)) : C.lunes < hoyLunes ? 'Semana pasada' : '';
+    $('#c-next').disabled = C.lunes >= hoyLunes;
     renderCuadrilla();
   }
   function renderCuadrilla() {
-    const names = crewFor(C.obra), box = $('#c-lista');
-    box.replaceChildren(...(names.length ? names.map(n => el('div', { class: 'person' }, el('b', null, n),
-      el('div', { class: 'seg', role: 'group', 'aria-label': 'Asistencia de ' + n }, [[1, 'Día'], [0.5, 'Medio'], [0, 'No']].map(([v, lab]) => el('button', { type: 'button', 'aria-pressed': String((C.marks[n] || 0) === v), onclick: () => { C.marks[n] = v; renderCuadrilla(); } }, lab)))))
-      : [el('p', { class: 'empty' }, 'Todavía no hay cuadrilla en esta obra. Agrega a la primera persona.')]));
-    let j = 0, t = 0, n = 0; names.forEach(x => { const v = C.marks[x] || 0; if (v) { n++; j += v; t += v * tarifaDe(x); } });
-    $('#c-sumtxt').textContent = n ? `${n} persona${n === 1 ? '' : 's'} · ${j} jornada${j === 1 ? '' : 's'}` : 'Sin marcar';
-    $('#c-sum').textContent = money(t);
-    const f = $('#c-fecha').value || dayKey(new Date()), dow = dateOnly(f).getUTCDay(), lun = addDays(f, -((dow + 6) % 7)), sab = addDays(lun, 5);
-    $('#c-wk-t').textContent = 'Semana del ' + fDia.format(dateOnly(lun)) + ' al ' + fDia.format(dateOnly(sab)) + ' · ' + C.obra;
-    const per = {}; asisDocs().filter(a => a.obra === C.obra && a.fecha >= lun && a.fecha <= sab).forEach(a => (a.personas || []).forEach(p => { const o = per[p.nombre] = per[p.nombre] || { d: 0, m: 0 }; o.d += +p.jornada; o.m += +p.jornada * (+p.tarifa || TARIFA); }));
-    const ks = Object.keys(per).sort((a, b) => a.localeCompare(b, 'es')); const tot = ks.reduce((s, k) => s + per[k].m, 0);
-    $('#c-wk').replaceChildren(...(ks.length ? ks.map(k => el('div', { class: 'brow' }, el('span', null, k + ' · ' + per[k].d + (per[k].d === 1 ? ' día' : ' días')), el('span', { class: 'r' }, money(per[k].m)))).concat([el('div', { class: 'brow' }, el('b', null, 'Total a pagar el sábado'), el('span', { class: 'r' }, money(tot)))])
-      : [el('p', { class: 'empty' }, 'Sin listas guardadas esta semana.')]));
+    const names = crewFor(C.obra);
+    $('#c-lista').replaceChildren(...(names.length ? names.map(n => {
+      const d = C.dias[n] || 0, t = tarifaDe(n);
+      const set = v => { C.dias[n] = Math.max(0, Math.min(7, v)); C.touched = true; renderCuadrilla(); };
+      return el('div', { class: 'person' },
+        el('div', { class: 'pname' }, el('b', null, n), el('span', { class: 'hint' }, money(t) + ' por día · ' + money(d * t))),
+        el('div', { class: 'stepper', role: 'group', 'aria-label': 'Días de ' + n },
+          el('button', { type: 'button', 'aria-label': 'Medio día menos', onclick: () => set(d - 0.5) }, '−'),
+          el('span', { class: 'sval' }, (d % 1 ? d.toFixed(1) : d) + (d === 1 ? ' día' : ' días')),
+          el('button', { type: 'button', 'aria-label': 'Medio día más', onclick: () => set(d + 0.5) }, '+')));
+    }) : [el('p', { class: 'empty' }, 'Todavía no hay cuadrilla fija en esta obra. Agrégala abajo.')]));
+    $('#c-extras').replaceChildren(...C.extras.map((x, i) => el('div', { class: 'brow' },
+      el('span', null, x.nombre + (x.tarea ? ' · ' + x.tarea : '') + (x.fecha ? ' · ' + fDia.format(dateOnly(x.fecha)) : '')),
+      el('span', { class: 'r' }, money(x.monto), ' ', el('button', { type: 'button', class: 'linkbtn', 'aria-label': 'Quitar ' + x.nombre, onclick: () => { C.extras.splice(i, 1); C.touched = true; renderCuadrilla(); } }, 'Quitar')))));
+    let j = 0, t = 0; names.forEach(n => { const d = C.dias[n] || 0; j += d; t += d * tarifaDe(n); });
+    const tx = C.extras.reduce((s, x) => s + (+x.monto || 0), 0);
+    $('#c-sumtxt').textContent = j || C.extras.length ? `${j} jornada${j === 1 ? '' : 's'}` + (C.extras.length ? ` + ${C.extras.length} extra${C.extras.length === 1 ? '' : 's'}` : '') : 'Sin días';
+    $('#c-sum').textContent = money(t + tx);
   }
-  $('#c-fecha').addEventListener('change', () => { C.docId = null; loadCuadrilla(); });
+  $('#c-prev').addEventListener('click', () => { C.lunes = addDays(C.lunes, -7); C.docKey = null; loadCuadrilla(); });
+  $('#c-next').addEventListener('click', () => { C.lunes = addDays(C.lunes, 7); C.docKey = null; loadCuadrilla(); });
+  $('#c-todos').addEventListener('click', () => { crewFor(C.obra).forEach(n => C.dias[n] = 6); C.touched = true; renderCuadrilla(); });
+  $('#c-fase').addEventListener('change', () => { C.touched = true; });
+  $('#x-add').addEventListener('click', () => {
+    const nombre = $('#x-nombre').value.trim(), tarea = $('#x-tarea').value.trim(), monto = Number(String($('#x-monto').value).replace(/[$,\s]/g, ''));
+    if (!nombre || !(monto > 0)) return status('#c-status', 'Para el extra pon al menos el nombre y cuánto se le pagó.', 'err');
+    C.extras.push({ nombre: cap(nombre), tarea, fecha: $('#x-fecha').value || C.lunes, monto });
+    ['#x-nombre', '#x-tarea', '#x-monto'].forEach(s => $(s).value = ''); status('#c-status', ''); C.touched = true; renderCuadrilla();
+  });
   $('#c-add').addEventListener('click', async () => {
     const n = $('#c-nuevo').value.trim().replace(/\s+/g, ' '); if (!n) return;
+    const tar = Number(String($('#c-nuevo-t').value).replace(/[$,\s]/g, '')) || TARIFA;
     const nombre = cap(n), list = crewList().map(p => Object.assign({}, p)), ex = list.find(p => slug(p.nombre) === slug(nombre));
-    if (ex) { ex.obras = Array.from(new Set((ex.obras || []).concat(C.obra))); ex.activo = true; } else list.push({ nombre, obras: [C.obra], tarifa: TARIFA, activo: true });
-    C.marks[ex ? ex.nombre : nombre] = C.marks[ex ? ex.nombre : nombre] || 1; $('#c-nuevo').value = '';
+    if (ex) { ex.obras = Array.from(new Set((ex.obras || []).concat(C.obra))); ex.activo = true; if ($('#c-nuevo-t').value) ex.tarifa = tar; } else list.push({ nombre, obras: [C.obra], tarifa: tar, activo: true });
+    C.dias[ex ? ex.nombre : nombre] = C.dias[ex ? ex.nombre : nombre] || 6; $('#c-nuevo').value = ''; $('#c-nuevo-t').value = '';
     const prev = S.queue.find(i => i.tipo === 'json' && i.path === 'cuadrilla.json'); if (prev) await qDel(prev.qid);
     S.crew = list; renderCuadrilla();
     await enviar({ tipo: 'json', path: 'cuadrilla.json', data: { personas: list }, msg: 'Cuadrilla: ' + nombre });
   });
-  $('#c-nuevo').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('#c-add').click(); } });
   $('#c-save').addEventListener('click', async () => {
-    const fecha = $('#c-fecha').value; if (!fecha) return status('#c-status', 'Elige el día.', 'err');
-    const personas = crewFor(C.obra).filter(n => C.marks[n]).map(n => ({ nombre: n, jornada: C.marks[n], tarifa: tarifaDe(n) }));
-    const id = asisId(fecha, C.obra);
-    const data = { id, fecha, obra: C.obra, fase: $('#c-fase').value || '', personas, total_jornadas: personas.reduce((s, p) => s + p.jornada, 0), total: personas.reduce((s, p) => s + p.jornada * p.tarifa, 0), estado: 'en bandeja', actualizado: nowLocalISO(), origen: 'app' };
-    const path = 'asistencia/' + id + '.json';
+    const sab = addDays(C.lunes, 5), id = semId(C.lunes, C.obra), path = 'asistencia/' + id + '.json';
+    const personas = crewFor(C.obra).filter(n => C.dias[n] > 0).map(n => ({ nombre: n, dias: C.dias[n], tarifa: tarifaDe(n), total: C.dias[n] * tarifaDe(n) }));
+    const extras = C.extras.map(x => Object.assign({}, x));
+    const data = { id, tipo: 'semana', obra: C.obra, semana_inicio: C.lunes, semana_fin: sab, fase: $('#c-fase').value || '', personas, extras,
+      total_jornadas: personas.reduce((s, p) => s + p.dias, 0), total: personas.reduce((s, p) => s + p.total, 0) + extras.reduce((s, x) => s + x.monto, 0),
+      estado: 'en bandeja', actualizado: nowLocalISO(), origen: 'app' };
     const prev = S.queue.find(i => i.tipo === 'json' && i.path === path); if (prev) await qDel(prev.qid);
     $('#c-save').disabled = true;
-    const r = await enviar({ tipo: 'json', path, data, msg: 'Lista ' + fecha + ' ' + C.obra });
-    $('#c-save').disabled = false; C.docId = null; loadCuadrilla();
-    toast(r === 'enviado' ? `Lista guardada: ${data.total_jornadas} jornadas en ${C.obra}.` : 'Sin señal: la lista se guardó en tu celular y se envía al reconectar.');
+    const r = await enviar({ tipo: 'json', path, data, msg: 'Nómina semana ' + C.lunes + ' ' + C.obra });
+    $('#c-save').disabled = false; C.docKey = null; loadCuadrilla();
+    toast(r === 'enviado' ? `Nómina guardada: ${money(data.total)} para el sábado.` : 'Sin señal: la nómina se guardó en tu celular y se manda al reconectar.');
   });
 
   // ---------- arranque ----------
