@@ -544,16 +544,18 @@ img { max-width: 100%; }
   }
   $('#g-cam').addEventListener('change', e => onFoto(e.target));
   $('#g-gal').addEventListener('change', e => onFoto(e.target));
-  $('#g-nota-btn').addEventListener('click', async () => {
-    const nota = $('#g-nota').value.trim(); if (!nota || !G.last) return;
+  async function guardarNota() {
+    const nota = $('#g-nota').value.trim(); if (!nota || !G.last) return false;
     const path = 'gastos/' + G.last.id + '.json';
     const it = S.queue.find(i => i.tipo === 'gasto' && i.path === path);
     if (it) { it.data.nota = nota; await qPut(it); await refreshQueue(); }
     else await enviar({ tipo: 'merge', path, data: { nota }, msg: 'Nota en gasto ' + G.last.id });
-    $('#g-nota').value = ''; toast('Nota agregada al ticket.');
-  });
-  $('#g-otro').addEventListener('click', () => abrirFoto());
-  $('#g-listo').addEventListener('click', () => show('hoy'));
+    $('#g-nota').value = ''; toast('Nota agregada al ticket.'); return true;
+  }
+  $('#g-nota-btn').addEventListener('click', guardarNota);
+  // Si escribiste una nota y no tocaste "Agregar nota", se guarda igual al salir.
+  $('#g-otro').addEventListener('click', () => { guardarNota(); abrirFoto(); });
+  $('#g-listo').addEventListener('click', async () => { await guardarNota(); show('hoy'); });
 
   // ---------- PENDIENTE ----------
   const P = { obra: null };
