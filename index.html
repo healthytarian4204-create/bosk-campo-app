@@ -118,7 +118,7 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); ou
 .sum { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-variant-numeric: tabular-nums; }
 .tot { font-family: var(--f-display); font-size: 1.6rem; font-weight: 700; }
 .wk { display: flex; flex-direction: column; }
-.nav { position: fixed; left: 0; right: 0; bottom: 0; background: var(--panel); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 6px max(8px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); z-index: 5; }
+.nav { position: fixed; left: 0; right: 0; bottom: 0; background: var(--panel); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: 6px max(8px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); z-index: 5; }
 .tab { display: flex; flex-direction: column; align-items: center; gap: 3px; min-height: 58px; justify-content: center; border: 0; background: none; color: var(--muted); font: inherit; font-size: .78rem; font-weight: 700; cursor: pointer; border-radius: 10px; }
 .tab[aria-current="page"] { color: var(--accent); }
 .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(86px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--bg); padding: 12px 16px; border-radius: 12px; display: flex; gap: 14px; align-items: center; justify-content: space-between; width: min(32rem, calc(100% - 32px)); box-sizing: border-box; z-index: 6; font-size: .95rem; }
@@ -147,6 +147,23 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); ou
 .row3 { display: grid; grid-template-columns: minmax(0, 1fr) 6.5rem auto; gap: 8px; margin-top: 8px; }
 .extraf { display: flex; flex-direction: column; gap: 8px; }
 .ibtn:disabled { opacity: .35; cursor: default; }
+.ob-tot { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.ob-tot b { font-family: var(--f-display); font-size: 2.4rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.fbar { display: flex; flex-direction: column; gap: 4px; }
+.fbar .fh { display: flex; justify-content: space-between; gap: 10px; font-size: .95rem; }
+.fbar .fh b { font-variant-numeric: tabular-nums; }
+.bar { height: 8px; border-radius: 99px; background: var(--soft); overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--moss); }
+.arow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; width: 100%; min-height: 56px; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+.arow + .arow { margin-top: 8px; }
+.arow .an { min-width: 0; overflow-wrap: anywhere; }
+.arow .ap { font-weight: 700; font-variant-numeric: tabular-nums; }
+.arow:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.bigval { font-family: var(--f-display); font-size: 3rem; font-weight: 700; text-align: center; font-variant-numeric: tabular-nums; line-height: 1; }
+.stepper.wide { grid-template-columns: 64px minmax(0, 1fr) 64px; width: 100%; }
+.stepper.wide button { min-height: 52px; }
+.fotoav { display: flex; gap: 12px; align-items: center; }
+.fotoav img { width: 72px; height: 72px; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); }
 @media (prefers-reduced-motion: no-preference) { .toast { animation: up .18s ease-out; } @keyframes up { from { transform: translate(-50%, 8px); opacity: 0; } } }
 @media (max-width: 360px) { .quick { grid-template-columns: 1fr; } .qbtn { min-height: 64px; flex-direction: row; align-items: center; justify-content: flex-start; } }
 
@@ -182,7 +199,7 @@ img { max-width: 100%; }
     <div class="card">
       <div class="label">En espera de pasar a los tableros</div>
       <div id="hoy-bandeja"><p class="empty">Nada en la bandeja.</p></div>
-      <p class="hint" id="hoy-rev">Claude revisa cada hora de 6 a.m. a 10 p.m.</p>
+      <p class="hint" id="hoy-rev">Claude revisa a las 2:10 p.m. y a las 11:10 p.m.</p>
     </div>
     <button type="button" class="back" id="b-llave" style="color:var(--muted);font-weight:400;font-size:.9rem">Cambiar la llave de GitHub</button>
   </section>
@@ -258,6 +275,36 @@ img { max-width: 100%; }
     <button class="btn" type="button" id="c-save">Guardar nómina de la semana</button>
   </section>
 
+  <!-- OBRA: avance -->
+  <section id="v-obra" aria-labelledby="h-obra" hidden style="flex-direction:column;gap:16px">
+    <div id="o-a" class="step">
+      <div><h2 id="h-obra">Avance de obra</h2><p class="sub" id="o-sub">El Naranjal</p></div>
+      <div id="o-dash" aria-live="polite"></div>
+      <button type="button" class="btn" id="o-reg">Registrar avance</button>
+    </div>
+    <div id="o-b" class="step" hidden>
+      <button type="button" class="back" id="o-back-a">‹ Avance de obra</button>
+      <div><h2>¿Qué avanzó?</h2><p class="sub">Toca la actividad y ponle su nuevo porcentaje.</p></div>
+      <div class="field"><span class="flabel">Fecha del avance</span><div class="chips" id="o-fechas"></div><input type="date" id="o-fecha" aria-label="Otra fecha"></div>
+      <div class="card"><span class="label">En proceso y lo que sigue</span><div id="o-vivas"></div></div>
+      <details class="more"><summary>Ver todas las actividades</summary><div id="o-todas" style="display:flex;flex-direction:column;gap:14px;margin-top:10px"></div></details>
+    </div>
+    <div id="o-c" class="step" hidden>
+      <button type="button" class="back" id="o-back-b">‹ Actividades</button>
+      <div><h2 id="o-act"></h2><p class="sub" id="o-act-sub"></p></div>
+      <div class="card">
+        <div class="bigval" id="o-val">0%</div>
+        <div class="stepper wide" role="group" aria-label="Ajustar porcentaje"><button type="button" id="o-menos" aria-label="5% menos">−</button><span class="sval" id="o-antes"></span><button type="button" id="o-mas" aria-label="5% más">+</button></div>
+        <div class="chips" id="o-rapidos"></div>
+      </div>
+      <label class="field"><span>¿Qué se hizo? <span class="hint">· opcional, puedes dictar</span></span><input type="text" id="o-nota" autocomplete="off" placeholder="Emparrillado terminado, mañana cimbra"></label>
+      <div class="fotoav"><button type="button" class="btn ghost small" id="o-foto-btn">Agregar foto (opcional)</button><img id="o-foto-img" alt="Foto del avance" hidden></div>
+      <input type="file" id="o-foto" accept="image/*" capture="environment" hidden>
+      <p class="status" id="o-status" role="status"></p>
+      <button type="button" class="btn" id="o-save">Guardar avance</button>
+    </div>
+  </section>
+
   <!-- CONEXIÓN -->
   <section id="v-setup" aria-labelledby="h-setup" hidden style="flex-direction:column;gap:16px">
     <form id="s-form" novalidate>
@@ -275,6 +322,7 @@ img { max-width: 100%; }
   <button class="tab" type="button" id="t-gasto" data-go="gasto"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg>Gasto</button>
   <button class="tab" type="button" id="t-pendiente" data-go="pendiente"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>Pendiente</button>
   <button class="tab" type="button" id="t-cuadrilla" data-go="cuadrilla"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 19c.8-3.4 3.2-5 6-5s5.2 1.6 6 5"/><path d="M15.5 14.2c2.3-.3 4.4 1 5.2 4"/></svg>Cuadrilla</button>
+  <button class="tab" type="button" id="t-obra" data-go="obra"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16"/><path d="M7 20v-6"/><path d="M12 20V9"/><path d="M17 20V5"/></svg>Obra</button>
 </nav>
 <div class="toast" id="toast" hidden role="status"><span id="toast-txt"></span><button type="button" id="toast-btn" hidden>Deshacer</button></div>
 
@@ -316,7 +364,7 @@ img { max-width: 100%; }
   const stamp = () => { const o = parts(new Date()); return o.year + o.month + o.day + '-' + o.hour + o.minute + o.second; };
 
   // ---------- estado ----------
-  const S = { pend: [], gastos: [], asis: [], crew: [], revision: null, queue: [], online: navigator.onLine, synced: false };
+  const S = { pend: [], gastos: [], asis: [], av: [], crew: [], revision: null, queue: [], online: navigator.onLine, synced: false };
   let TOKEN = ls.get('bosk-token');
 
   // ---------- toast ----------
@@ -372,7 +420,8 @@ img { max-width: 100%; }
       const limite = addDays(dayKey(new Date()), -45).replace(/-/g, '');
       const want = (tree.tree || []).filter(n => n.type === 'blob' && (/^pendientes\/.+\.json$/.test(n.path) || /^cuadrilla\.json$/.test(n.path) || /^revision\.json$/.test(n.path) ||
         (/^asistencia\/(semana-)?\d{4}-\d{2}-\d{2}.*\.json$/.test(n.path) && n.path.replace(/^asistencia\/(semana-)?/, '').slice(0, 10).replace(/-/g, '') >= limite) ||
-        (/^gastos\/g-(\d{8}).*\.json$/.test(n.path) && n.path.slice(9, 17) >= limite)));
+        (/^gastos\/g-(\d{8}).*\.json$/.test(n.path) && n.path.slice(9, 17) >= limite) ||
+        /^obra\/[a-z0-9-]+\.json$/.test(n.path) || (/^avance\/a-(\d{8}).*\.json$/.test(n.path) && n.path.slice(9, 17) >= limite)));
       const arr = (tree.tree || []).filter(n => n.type === 'blob' && /^arranque\/\d{4}-\d{2}-\d{2}\.json$/.test(n.path)).sort((a, b) => a.path < b.path ? 1 : -1)[0];
       if (arr) want.push(arr);
       const keep = {};
@@ -389,6 +438,7 @@ img { max-width: 100%; }
     S.pend = v.filter(([p]) => p.startsWith('pendientes/')).map(([, x]) => x.data);
     S.gastos = v.filter(([p]) => p.startsWith('gastos/')).map(([, x]) => x.data);
     S.asis = v.filter(([p]) => p.startsWith('asistencia/')).map(([, x]) => x.data);
+    S.av = v.filter(([p]) => p.startsWith('avance/')).map(([, x]) => x.data);
     S.crew = (CACHE['cuadrilla.json'] && CACHE['cuadrilla.json'].data.personas) || [];
     S.revision = CACHE['revision.json'] && CACHE['revision.json'].data;
     const ak = Object.keys(CACHE).filter(p => p.startsWith('arranque/')).sort().pop();
@@ -419,6 +469,9 @@ img { max-width: 100%; }
     if (item.tipo === 'gasto') {
       if (item.foto && !item.data.foto) { const p = 'fotos/' + item.data.id + '.jpg'; await putFile(p, await blob64(item.foto), 'Foto de ticket ' + item.data.id); item.data.foto = p; item.foto = null; }
       await putJSON(item.path, item.data, 'Gasto ' + (item.data.obra || 'Bos.k') + ' ' + item.data.id);
+    } else if (item.tipo === 'avance') {
+      if (item.foto && !item.data.foto) { const p = 'fotos/' + item.data.id + '.jpg'; await putFile(p, await blob64(item.foto), 'Foto de avance ' + item.data.id); item.data.foto = p; item.foto = null; }
+      await putJSON(item.path, item.data, 'Avance ' + item.data.obra + ': ' + item.data.actividad.slice(0, 50) + ' ' + Math.round(item.data.avance * 100) + '%');
     } else if (item.tipo === 'json') { await putJSON(item.path, item.data, item.msg || 'Registro desde Bos.k Campo'); }
     else if (item.tipo === 'merge') { const cur = (CACHE[item.path] && CACHE[item.path].data) || {}; await putJSON(item.path, Object.assign({}, cur, item.data), item.msg || 'Cambio desde Bos.k Campo'); }
     fromCache();
@@ -447,16 +500,16 @@ img { max-width: 100%; }
   }
 
   // ---------- navegación ----------
-  const VIEWS = ['hoy', 'gasto', 'pendiente', 'cuadrilla'];
+  const VIEWS = ['hoy', 'gasto', 'pendiente', 'cuadrilla', 'obra'];
   function show(v) {
     if (!TOKEN) return showSetup();
     $('#v-setup').hidden = true; $('.nav').hidden = false;
     VIEWS.forEach(x => { const s = $('#v-' + x); s.hidden = x !== v; if (x === v) s.style.display = 'flex'; const t = $('#t-' + x); if (x === v) t.setAttribute('aria-current', 'page'); else t.removeAttribute('aria-current'); });
-    if (v === 'cuadrilla') loadCuadrilla(); if (v === 'pendiente') initPendiente(false); if (v === 'hoy') renderHoy(); if (v === 'gasto') initGasto();
+    if (v === 'cuadrilla') loadCuadrilla(); if (v === 'pendiente') initPendiente(false); if (v === 'hoy') renderHoy(); if (v === 'gasto') initGasto(); if (v === 'obra') initObra();
     window.scrollTo(0, 0);
   }
   document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => show(b.dataset.go)));
-  function renderAll() { renderHoy(); if (!$('#v-cuadrilla').hidden) { if (!C.touched) C.docKey = null; loadCuadrilla(); } }
+  function renderAll() { renderHoy(); if (!$('#v-obra').hidden && !$('#o-a').hidden) renderObra(); if (!$('#v-cuadrilla').hidden) { if (!C.touched) C.docKey = null; loadCuadrilla(); } }
 
   // ---------- conexión con GitHub (una sola vez) ----------
   function showSetup(msg) {
@@ -520,7 +573,7 @@ img { max-width: 100%; }
     renderArranque();
     $('#hoy-fecha').textContent = cap(fLargo.format(new Date()));
     const rv = S.revision && S.revision.at ? new Date(S.revision.at) : null;
-    $('#hoy-rev').textContent = rv ? 'Claude revisó por última vez ' + (dayKey(rv) === dayKey(new Date()) ? 'hoy a las ' + fHora.format(rv) : fDia.format(rv) + ' · ' + fHora.format(rv)) + '. Revisa cada hora de 6 a.m. a 10 p.m.' : 'Claude revisa cada hora de 6 a.m. a 10 p.m.';
+    $('#hoy-rev').textContent = rv ? 'Claude revisó por última vez ' + (dayKey(rv) === dayKey(new Date()) ? 'hoy a las ' + fHora.format(rv) : fDia.format(rv) + ' · ' + fHora.format(rv)) + '. Revisa a las 2:10 p.m. y a las 11:10 p.m.' : 'Claude revisa a las 2:10 p.m. y a las 11:10 p.m.';
     const box = $('#hoy-pend');
     if (!S.synced && !Object.keys(CACHE).length) { box.replaceChildren(el('p', { class: 'empty' }, S.online ? 'Cargando pendientes…' : 'Sin señal. Cuando haya internet aparecen tus pendientes.')); }
     else {
@@ -541,15 +594,18 @@ img { max-width: 100%; }
               p._cola ? el('span', { class: 'pill off' }, 'por enviar') : (!done && !p.tarea_id && t && t > now ? el('span', { class: 'pill' }, 'aviso en la próxima revisión') : null))));
         }))));
     }
-    const bq = S.queue.filter(i => i.tipo === 'gasto' || (i.tipo === 'json' && i.path.startsWith('asistencia/')));
+    const bq = S.queue.filter(i => i.tipo === 'gasto' || i.tipo === 'avance' || (i.tipo === 'json' && i.path.startsWith('asistencia/')));
     const qPaths = new Set(bq.map(i => i.path));
-    const items = bq.map(i => Object.assign({ _cola: true, _tipo: i.tipo === 'gasto' ? 'gasto' : 'lista' }, i.data))
+    const items = bq.map(i => Object.assign({ _cola: true, _tipo: i.tipo === 'json' ? 'lista' : i.tipo }, i.data))
+      .concat(S.av.filter(a => a.estado === 'en bandeja' && !qPaths.has('avance/' + a.id + '.json')).map(a => Object.assign({ _tipo: 'avance' }, a)))
       .concat(S.gastos.filter(g => (g.estado === 'en bandeja' || g.estado === 'procesando') && !qPaths.has('gastos/' + g.id + '.json')).map(g => Object.assign({ _tipo: 'gasto' }, g)))
       .concat(S.asis.filter(a => a.estado === 'en bandeja' && !qPaths.has('asistencia/' + a.id + '.json')).map(a => Object.assign({ _tipo: 'lista' }, a)))
       .sort((a, b) => String(b.creado || b.actualizado || '').localeCompare(String(a.creado || a.actualizado || '')));
     const bb = $('#hoy-bandeja');
     if (!items.length) bb.replaceChildren(el('p', { class: 'empty' }, 'Nada en espera. Todo está en los tableros.'));
-    else bb.replaceChildren(...items.slice(0, 8).map(x => x._tipo === 'gasto'
+    else bb.replaceChildren(...items.slice(0, 8).map(x => x._tipo === 'avance'
+      ? el('div', { class: 'brow' }, el('span', null, 'Avance · ' + x.actividad + ' ', el('span', { class: 'pill' + (x._cola ? ' off' : '') }, x._cola ? 'por enviar' : 'en espera')), el('span', { class: 'r' }, Math.round(x.avance * 100) + '%'))
+      : x._tipo === 'gasto'
       ? el('div', { class: 'brow' }, el('span', null, (x.proveedor || 'Ticket ' + fDia.format(dateOnly(x.fecha))) + ' · ' + (x.obra || 'Bos.k interno') + ' ', el('span', { class: 'pill' + (x._cola ? ' off' : '') }, x._cola ? 'por enviar' : x.estado === 'procesando' ? 'registrando…' : 'en espera')), el('span', { class: 'r' }, x.total != null ? money(x.total) : ''))
       : el('div', { class: 'brow' }, el('span', null, (x.tipo === 'semana' ? 'Nómina semana del ' + fDia.format(dateOnly(x.semana_inicio)) : 'Lista ' + fDia.format(dateOnly(x.fecha))) + ' · ' + x.obra + ' ', el('span', { class: 'pill' + (x._cola ? ' off' : '') }, x._cola ? 'por enviar' : 'en espera')), el('span', { class: 'r' }, x.tipo === 'semana' ? money(x.total) : (x.total_jornadas || 0) + ' jorn.'))),
       items.length > 8 ? el('p', { class: 'hint' }, `y ${items.length - 8} más`) : '');
@@ -638,6 +694,10 @@ img { max-width: 100%; }
     list.push(['Mañana 7 a.m.', man, '07:00'], ['Mañana 12 p.m.', man, '12:00']);
     return list;
   }
+  function proxRevision() {
+    const hoy = dayKey(new Date());
+    return [localISO(hoy, '14:10'), localISO(hoy, '23:10'), localISO(addDays(hoy, 1), '14:10')].map(x => new Date(x)).find(d => d.getTime() > Date.now());
+  }
   function initPendiente(reset) {
     chips($('#p-obra'), OBRAS.map(o => [o, o]).concat([['', 'Sin obra']]), () => P.obra == null ? '' : P.obra, v => P.obra = v || null);
     const q = quickTimes();
@@ -658,8 +718,8 @@ img { max-width: 100%; }
     const r = await enviar({ tipo: 'json', path: 'pendientes/' + id + '.json', data, msg: 'Pendiente: ' + texto.slice(0, 60) });
     $('#p-save').disabled = false; status('#p-status', '');
     $('#p-texto').value = ''; P.obra = null; initPendiente(true);
-    const pronto = when.getTime() - Date.now() < 65 * 60000;
-    toast(r === 'en cola' ? 'Sin señal: guardado en tu celular. Se manda al reconectar.' : `Anotado para el ${fDia.format(when)} a las ${fHora.format(when)}.` + (pronto ? ' Ojo: el aviso puede no alcanzar a programarse antes.' : ''));
+    const pronto = when.getTime() < proxRevision().getTime() + 5 * 60000;
+    toast(r === 'en cola' ? 'Sin señal: guardado en tu celular. Se manda al reconectar.' : `Anotado para el ${fDia.format(when)} a las ${fHora.format(when)}.` + (pronto ? ' Ojo: el aviso no alcanza a programarse antes de la revisión; si urge, díctaselo a Claude en el chat.' : ''));
     show('hoy');
   });
 
@@ -758,6 +818,116 @@ img { max-width: 100%; }
     const r = await enviar({ tipo: 'json', path, data, msg: 'Nómina semana ' + C.lunes + ' ' + C.obra });
     $('#c-save').disabled = false; C.docKey = null; loadCuadrilla();
     toast(r === 'enviado' ? `Nómina guardada: ${money(data.total)} para el sábado.` : 'Sin señal: la nómina se guardó en tu celular y se manda al reconectar.');
+  });
+
+  // ---------- OBRA: avance ----------
+  const A = { obra: 'El Naranjal', fecha: null, act: null, val: 0, foto: null, fotoUrl: null };
+  const pctTxt = v => Math.round(v * 100) + '%';
+  function obraDat() { const c = CACHE['obra/' + slug(A.obra) + '.json']; return c && c.data; }
+  function avPend() {
+    const q = S.queue.filter(i => i.tipo === 'avance').map(i => Object.assign({ _cola: true }, i.data));
+    const ids = new Set(q.map(a => a.id));
+    return S.av.filter(a => !ids.has(a.id) && a.estado === 'en bandeja').concat(q).filter(a => a.obra === A.obra);
+  }
+  // Actividades con su avance, encimando lo capturado que todavía no pasa a la base de Mau.
+  function acts() {
+    const d = obraDat(); if (!d) return [];
+    const over = {}; avPend().sort((a, b) => (a.fecha + a.creado).localeCompare(b.fecha + b.creado)).forEach(p => over[p.actividad_id] = p);
+    return d.actividades.slice().sort((a, b) => a.fase.localeCompare(b.fase) || a.orden - b.orden)
+      .map(a => over[a.id] ? Object.assign({}, a, { avance: over[a.id].avance, nota: over[a.id].nota || a.nota, _pend: over[a.id] }) : a);
+  }
+  const pond = list => { const j = list.reduce((s, a) => s + (+a.jornadas || 0), 0); return j ? list.reduce((s, a) => s + (+a.jornadas || 0) * (+a.avance || 0), 0) / j : 0; };
+  function vivas(list) {
+    const out = list.filter(a => a.avance > 0 && a.avance < 1);
+    const fases = Array.from(new Set(list.map(a => a.fase)));
+    fases.forEach(f => {
+      const fl = list.filter(a => a.fase === f), avf = pond(fl);
+      if (avf <= 0 || avf >= 1) return;
+      const sig = fl.find(a => !(a.avance > 0));
+      if (sig && !out.includes(sig)) out.push(Object.assign({ _sigue: true }, sig));
+    });
+    return out;
+  }
+  function oStep(s) { ['a', 'b', 'c'].forEach(x => $('#o-' + x).hidden = x !== s); window.scrollTo(0, 0); }
+  function initObra() { oStep('a'); renderObra(); }
+  function renderObra() {
+    const d = obraDat(), box = $('#o-dash');
+    $('#o-reg').disabled = !d;
+    if (!d) { box.replaceChildren(el('div', { class: 'card' }, el('p', { class: 'empty' }, S.online ? 'Todavía no llegan los datos de la obra. Pícale a actualizar arriba.' : 'Sin señal. Cuando haya internet aparecen los datos de la obra.'))); return; }
+    const list = acts(), pend = avPend();
+    const fn = {}; (d.fases || []).forEach(f => fn[f.fase] = f.nombre);
+    const fases = Array.from(new Set(list.map(a => a.fase)));
+    $('#o-sub').textContent = A.obra + ' · corte del ' + fDia.format(dateOnly(d.corte)) + (pend.length ? ' · ' + pend.length + ' cambio' + (pend.length === 1 ? '' : 's') + ' por pasar' : '');
+    const tot = pond(list);
+    const resumen = el('div', { class: 'card' },
+      el('div', { class: 'ob-tot' }, el('span', { class: 'label' }, 'Avance general'), el('b', null, pctTxt(tot))),
+      el('div', { class: 'bar', 'aria-hidden': 'true' }, el('i', { style: 'width:' + Math.round(tot * 100) + '%' })),
+      ...fases.map(f => { const v = pond(list.filter(a => a.fase === f)); return el('div', { class: 'fbar' },
+        el('div', { class: 'fh' }, el('span', null, fn[f] || f.toUpperCase()), el('b', null, pctTxt(v))),
+        el('div', { class: 'bar', 'aria-hidden': 'true' }, el('i', { style: 'width:' + Math.round(v * 100) + '%' }))); }),
+      el('p', { class: 'hint', style: 'margin:0' }, 'Cada fase pesa sus actividades por las jornadas del presupuesto.'));
+    const vv = vivas(list);
+    const enCurso = el('div', { class: 'card' }, el('span', { class: 'label' }, 'En proceso y lo que sigue'),
+      ...(vv.length ? vv.map(a => el('div', { class: 'brow' },
+        el('span', null, (a._sigue ? 'Sigue: ' : '') + a.actividad + ' ', a._pend ? el('span', { class: 'pill off' }, 'por pasar') : '', a.nota && !a._sigue ? el('span', { class: 'hint', style: 'display:block' }, a.nota) : ''),
+        el('span', { class: 'r' }, a._sigue ? '' : pctTxt(a.avance)))) : [el('p', { class: 'empty' }, 'Nada en proceso.')]));
+    box.replaceChildren(resumen, el('div', { style: 'height:12px' }), enCurso);
+  }
+  function aRow(a) {
+    return el('button', { type: 'button', class: 'arow', onclick: () => abrirAct(a) },
+      el('span', { class: 'an' }, (a._sigue ? 'Sigue: ' : '') + a.actividad, el('span', { class: 'hint', style: 'display:block' }, a.fase.toUpperCase() + (a._pend ? ' · por pasar' : ''))),
+      el('span', { class: 'ap' }, pctTxt(a.avance)));
+  }
+  function initCaptura() {
+    const hoy = dayKey(new Date()), ayer = addDays(hoy, -1);
+    if (!A.fecha) A.fecha = hoy;
+    $('#o-fecha').value = A.fecha; $('#o-fecha').max = hoy;
+    $('#o-fechas').replaceChildren(...[[hoy, 'Hoy'], [ayer, 'Ayer']].map(([v, l]) => el('button', { type: 'button', class: 'chip', 'aria-pressed': String(A.fecha === v), onclick: () => { A.fecha = v; initCaptura(); } }, l)));
+    const list = acts(), d = obraDat(), fn = {}; ((d && d.fases) || []).forEach(f => fn[f.fase] = f.nombre);
+    const vv = vivas(list);
+    $('#o-vivas').replaceChildren(...(vv.length ? vv.map(aRow) : [el('p', { class: 'empty' }, 'Nada en proceso. Busca la actividad en "Ver todas".')]));
+    const fases = Array.from(new Set(list.map(a => a.fase)));
+    $('#o-todas').replaceChildren(...fases.map(f => el('div', null, el('div', { class: 'label', style: 'margin-bottom:8px' }, fn[f] || f.toUpperCase()), ...list.filter(a => a.fase === f).map(aRow))));
+    oStep('b');
+  }
+  function abrirAct(a) {
+    A.act = a; A.val = Math.round((+a.avance || 0) * 100); A.foto = null;
+    try { if (A.fotoUrl) URL.revokeObjectURL(A.fotoUrl); } catch (e) {}
+    A.fotoUrl = null; $('#o-foto-img').hidden = true; $('#o-nota').value = ''; status('#o-status', '');
+    $('#o-act').textContent = a.actividad;
+    $('#o-act-sub').textContent = a.fase.toUpperCase() + ' · ' + fDia.format(dateOnly(A.fecha)) + ' · antes ' + pctTxt(a.avance);
+    pintaVal(); oStep('c');
+  }
+  function pintaVal() {
+    $('#o-val').textContent = A.val + '%';
+    $('#o-antes').textContent = 'antes ' + pctTxt(A.act.avance);
+    $('#o-menos').disabled = A.val <= 0; $('#o-mas').disabled = A.val >= 100;
+    $('#o-rapidos').replaceChildren(...[25, 50, 75, 100].map(v => el('button', { type: 'button', class: 'chip', 'aria-pressed': String(A.val === v), onclick: () => { A.val = v; pintaVal(); } }, v === 100 ? 'Terminada' : v + '%')));
+  }
+  $('#o-menos').addEventListener('click', () => { A.val = Math.max(0, A.val - 5); pintaVal(); });
+  $('#o-mas').addEventListener('click', () => { A.val = Math.min(100, A.val + 5); pintaVal(); });
+  $('#o-reg').addEventListener('click', () => { A.fecha = dayKey(new Date()); initCaptura(); });
+  $('#o-back-a').addEventListener('click', initObra);
+  $('#o-back-b').addEventListener('click', initCaptura);
+  $('#o-fecha').addEventListener('change', e => { if (e.target.value) { A.fecha = e.target.value; initCaptura(); } });
+  $('#o-foto-btn').addEventListener('click', () => $('#o-foto').click());
+  $('#o-foto').addEventListener('change', async e => {
+    const f = e.target.files && e.target.files[0]; e.target.value = ''; if (!f) return;
+    A.foto = await shrink(f); try { if (A.fotoUrl) URL.revokeObjectURL(A.fotoUrl); } catch (x) {}
+    A.fotoUrl = URL.createObjectURL(A.foto); $('#o-foto-img').src = A.fotoUrl; $('#o-foto-img').hidden = false; $('#o-foto-btn').textContent = 'Cambiar foto';
+  });
+  $('#o-save').addEventListener('click', async () => {
+    const a = A.act; if (!a) return;
+    if (A.val === Math.round((+a.avance || 0) * 100) && !$('#o-nota').value.trim()) return status('#o-status', 'Mueve el porcentaje o escribe qué se hizo.', 'err');
+    const id = 'a-' + stamp() + '-' + rid();
+    const base = (obraDat().actividades || []).find(x => x.id === a.id) || a;
+    const data = { id, tipo: 'avance', obra: A.obra, fecha: A.fecha, actividad_id: a.id, actividad: a.actividad, fase: a.fase,
+      avance_anterior: +base.avance || 0, avance: A.val / 100, nota: $('#o-nota').value.trim(), foto: null, estado: 'en bandeja', creado: nowLocalISO(), origen: 'app' };
+    $('#o-save').disabled = true; status('#o-status', 'Guardando…');
+    const r = await enviar({ tipo: 'avance', path: 'avance/' + id + '.json', data, foto: A.foto || null });
+    $('#o-save').disabled = false; status('#o-status', ''); $('#o-foto-btn').textContent = 'Agregar foto (opcional)';
+    toast(r === 'enviado' ? `${a.actividad}: ${A.val}%. Pasa a la página de Mau en la próxima revisión.` : 'Sin señal: el avance se guardó en tu celular y se manda al reconectar.');
+    initCaptura();
   });
 
   // ---------- arranque ----------
