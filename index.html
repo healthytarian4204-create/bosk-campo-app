@@ -208,12 +208,13 @@ img { max-width: 100%; }
   <section id="v-gasto" aria-labelledby="h-gasto" hidden style="flex-direction:column;gap:16px">
     <div id="g-a" class="step">
       <div class="steph"><h2 id="h-gasto">¿De qué obra es el gasto?</h2>
-        <div class="seg" role="group" aria-label="Foto desde"><button type="button" id="g-src-cam" aria-pressed="true">Cámara</button><button type="button" id="g-src-gal" aria-pressed="false">Galería</button></div></div>
+        <div class="seg" role="group" aria-label="Comprobante"><button type="button" id="g-src-cam" aria-pressed="true">Cámara</button><button type="button" id="g-src-gal" aria-pressed="false">Galería</button><button type="button" id="g-src-sin" aria-pressed="false">Sin nota</button></div></div>
+      <p class="hint" id="g-src-hint" hidden style="margin:0">Sin nota: para gastos sin ticket ni comprobante. No pide foto.</p>
       <div class="big" id="g-obras"></div>
     </div>
     <div id="g-b" class="step" hidden>
       <button type="button" class="back" id="g-back">‹ <span id="g-back-t"></span></button>
-      <div><h2>¿Para qué fase?</h2><p class="sub">Al elegir se abre la cámara. Si no sabes, Claude lo decide con el ticket.</p></div>
+      <div><h2>¿Para qué fase?</h2><p class="sub" id="g-b-sub">Al elegir se abre la cámara. Si no sabes, Claude lo decide con el ticket.</p></div>
       <div class="big" id="g-fases"></div>
     </div>
     <div id="g-c" class="step" hidden>
@@ -222,6 +223,19 @@ img { max-width: 100%; }
       <button type="button" class="btn ghost" id="g-nota-btn">Agregar nota</button>
       <div class="row2"><button type="button" class="btn" id="g-otro">Otro ticket</button><button type="button" class="btn ghost" id="g-listo">Listo</button></div>
     </div>
+    <form id="g-d" class="step" hidden novalidate>
+      <button type="button" class="back" id="g-back-d">‹ <span id="g-back-d-t"></span></button>
+      <div><h2>Gasto sin nota</h2><p class="sub" id="g-d-sub"></p></div>
+      <label class="field"><span>¿Qué se compró o pagó?</span><input type="text" id="g-d-con" autocomplete="off" placeholder="2 viajes de arena con Martín"></label>
+      <div class="row2">
+        <label class="field"><span>Monto</span><input type="text" inputmode="decimal" id="g-d-monto" autocomplete="off" placeholder="$0.00"></label>
+        <label class="field"><span>Día</span><input type="date" id="g-d-fecha"></label>
+      </div>
+      <label class="field"><span>¿A quién? <span class="hint">· opcional</span></span><input type="text" id="g-d-prov" autocomplete="off" placeholder="Martín, maderería, flete…"></label>
+      <label class="field"><span>¿Algo que deba saber? <span class="hint">· opcional</span></span><input type="text" id="g-d-nota" autocomplete="off" placeholder="Lo pagó Mau, fue en transferencia…"></label>
+      <p class="status" id="g-d-status" role="status"></p>
+      <button type="submit" class="btn" id="g-d-save">Guardar gasto</button>
+    </form>
     <input type="file" id="g-cam" accept="image/*" capture="environment" hidden>
     <input type="file" id="g-gal" accept="image/*" hidden>
   </section>
@@ -606,7 +620,7 @@ img { max-width: 100%; }
     else bb.replaceChildren(...items.slice(0, 8).map(x => x._tipo === 'avance'
       ? el('div', { class: 'brow' }, el('span', null, 'Avance · ' + x.actividad + ' ', el('span', { class: 'pill' + (x._cola ? ' off' : '') }, x._cola ? 'por enviar' : 'en espera')), el('span', { class: 'r' }, Math.round(x.avance * 100) + '%'))
       : x._tipo === 'gasto'
-      ? el('div', { class: 'brow' }, el('span', null, (x.proveedor || 'Ticket ' + fDia.format(dateOnly(x.fecha))) + ' · ' + (x.obra || 'Bos.k interno') + ' ', el('span', { class: 'pill' + (x._cola ? ' off' : '') }, x._cola ? 'por enviar' : x.estado === 'procesando' ? 'registrando…' : 'en espera')), el('span', { class: 'r' }, x.total != null ? money(x.total) : ''))
+      ? el('div', { class: 'brow' }, el('span', null, (x.sin_comprobante ? (x.conceptos && x.conceptos[0]) || 'Gasto sin nota' : (x.proveedor || 'Ticket ' + fDia.format(dateOnly(x.fecha)))) + ' · ' + (x.obra || 'Bos.k interno') + ' ', el('span', { class: 'pill' + (x._cola ? ' off' : '') }, x._cola ? 'por enviar' : x.estado === 'procesando' ? 'registrando…' : 'en espera')), el('span', { class: 'r' }, x.total != null ? money(x.total) : ''))
       : el('div', { class: 'brow' }, el('span', null, (x.tipo === 'semana' ? 'Nómina semana del ' + fDia.format(dateOnly(x.semana_inicio)) : 'Lista ' + fDia.format(dateOnly(x.fecha))) + ' · ' + x.obra + ' ', el('span', { class: 'pill' + (x._cola ? ' off' : '') }, x._cola ? 'por enviar' : 'en espera')), el('span', { class: 'r' }, x.tipo === 'semana' ? money(x.total) : (x.total_jornadas || 0) + ' jorn.'))),
       items.length > 8 ? el('p', { class: 'hint' }, `y ${items.length - 8} más`) : '');
   }
@@ -627,11 +641,32 @@ img { max-width: 100%; }
   const OBRAS_G = OBRAS.concat(['Bos.k interno']);
   const FASE_LBL = { 'El Naranjal': [['f01', 'F01', 'Cimentación'], ['f02', 'F02', 'Instalaciones'], ['f03', 'F03', 'Estructura · tratamiento']] };
   const G = { obra: null, fase: '', src: ls.get('bosk-src') === 'gal' ? 'gal' : 'cam', last: null };
-  function gStep(s) { ['a', 'b', 'c'].forEach(x => $('#g-' + x).hidden = x !== s); window.scrollTo(0, 0); }
-  function setSrc(s) { G.src = s; $('#g-src-cam').setAttribute('aria-pressed', String(s === 'cam')); $('#g-src-gal').setAttribute('aria-pressed', String(s === 'gal')); ls.set('bosk-src', s); }
-  $('#g-src-cam').addEventListener('click', () => setSrc('cam'));
-  $('#g-src-gal').addEventListener('click', () => setSrc('gal'));
-  const abrirFoto = () => (G.src === 'gal' ? $('#g-gal') : $('#g-cam')).click();
+  function gStep(s) { ['a', 'b', 'c', 'd'].forEach(x => $('#g-' + x).hidden = x !== s); window.scrollTo(0, 0); }
+  function setSrc(s) { G.src = s; ['cam', 'gal', 'sin'].forEach(x => $('#g-src-' + x).setAttribute('aria-pressed', String(s === x))); $('#g-src-hint').hidden = s !== 'sin'; if (s !== 'sin') ls.set('bosk-src', s); }
+  ['cam', 'gal', 'sin'].forEach(x => $('#g-src-' + x).addEventListener('click', () => { G.src = x; initGasto(); }));
+  const gQuien = () => G.obra === 'Bos.k interno' ? 'Gasto interno de Bos.k' : G.obra + (G.fase ? ' · ' + (FASE_LBL[G.obra] || []).filter(x => x[0] === G.fase).map(x => x[1] + ' ' + x[2])[0] : '');
+  function abrirSinNota() {
+    $('#g-d-sub').textContent = gQuien(); $('#g-back-d-t').textContent = FASE_LBL[G.obra] ? 'Fase' : 'Obra';
+    $('#g-d-fecha').value = dayKey(new Date()); $('#g-d-fecha').max = dayKey(new Date()); status('#g-d-status', '');
+    gStep('d'); setTimeout(() => $('#g-d-con').focus(), 50);
+  }
+  const abrirFoto = () => G.src === 'sin' ? abrirSinNota() : (G.src === 'gal' ? $('#g-gal') : $('#g-cam')).click();
+  $('#g-back-d').addEventListener('click', () => gStep(FASE_LBL[G.obra] ? 'b' : 'a'));
+  $('#g-d').addEventListener('submit', async ev => {
+    ev.preventDefault();
+    const con = $('#g-d-con').value.trim(), monto = Number(String($('#g-d-monto').value).replace(/[$,\s]/g, ''));
+    if (!con) return status('#g-d-status', 'Escribe qué se compró o pagó.', 'err');
+    if (!(monto > 0)) return status('#g-d-status', 'Pon el monto.', 'err');
+    const id = 'g-' + stamp() + '-' + rid(), interno = G.obra === 'Bos.k interno';
+    const data = { id, obra: interno ? '' : G.obra, fase: G.fase || '', fecha: $('#g-d-fecha').value || dayKey(new Date()), proveedor: $('#g-d-prov').value.trim(), total: monto, conceptos: [con],
+      clasificacion: interno ? 'Interno Bos.k' : '', pagado_por: 'Bos.k', forma_pago: '', nota: $('#g-d-nota').value.trim(), foto: null, sin_comprobante: true, ticket_leido: false,
+      por_confirmar: [], estado: 'en bandeja', creado: nowLocalISO(), origen: 'app' };
+    $('#g-d-save').disabled = true;
+    const r = await enviar({ tipo: 'gasto', path: 'gastos/' + id + '.json', data, foto: null });
+    $('#g-d-save').disabled = false; ['#g-d-con', '#g-d-monto', '#g-d-prov', '#g-d-nota'].forEach(x => $(x).value = '');
+    toast(r === 'enviado' ? `Gasto sin nota guardado: ${money(monto)}. Claude lo registra en la próxima revisión.` : 'Sin señal: guardado en tu celular, se manda al reconectar.');
+    show('hoy');
+  });
   function initGasto() {
     setSrc(G.src);
     $('#g-obras').replaceChildren(...OBRAS_G.map(o => el('button', { type: 'button', class: 'bigbtn', onclick: () => {
@@ -639,10 +674,11 @@ img { max-width: 100%; }
       const f = FASE_LBL[o];
       if (!f) { abrirFoto(); return; }
       $('#g-back-t').textContent = o;
+      $('#g-b-sub').textContent = G.src === 'sin' ? 'Luego pones qué fue y cuánto. Si no sabes la fase, Claude la decide.' : 'Al elegir se abre la cámara. Si no sabes, Claude lo decide con el ticket.';
       $('#g-fases').replaceChildren(...f.map(([v, c, n]) => el('button', { type: 'button', class: 'bigbtn', onclick: () => { G.fase = v; abrirFoto(); } }, el('b', null, c), el('span', null, n))),
         el('button', { type: 'button', class: 'bigbtn soft', onclick: () => { G.fase = ''; abrirFoto(); } }, el('b', null, 'No sé'), el('span', null, 'Que Claude decida')));
       gStep('b');
-    } }, el('b', null, o === 'Bos.k interno' ? 'Bos.k' : o), el('span', null, o === 'Bos.k interno' ? 'Gasto interno' : (FASE_LBL[o] ? 'Elegir fase' : 'Abre la cámara')))));
+    } }, el('b', null, o === 'Bos.k interno' ? 'Bos.k' : o), el('span', null, o === 'Bos.k interno' ? 'Gasto interno' : (FASE_LBL[o] ? 'Elegir fase' : G.src === 'sin' ? 'Sin foto' : 'Abre la cámara')))));
     gStep('a');
   }
   $('#g-back').addEventListener('click', () => gStep('a'));
