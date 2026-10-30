@@ -65,7 +65,24 @@ h2 { font-family: var(--f-display); font-size: 1.55rem; line-height: 1.15; margi
 .pill { font-size: .74rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--soft); color: var(--muted); white-space: nowrap; }
 .pill.warn { background: var(--warn-soft); color: var(--warn); }
 .pill.off { background: var(--off-soft); color: var(--off); }
-.quick { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.quick { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.dn-big { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.dn-big b { font-family: var(--f-display); font-size: 1.9rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.obras { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.ocard { display: flex; flex-direction: column; gap: 6px; padding: 14px; border-radius: 14px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit; text-align: left; min-width: 0; }
+button.ocard { cursor: pointer; }
+button.ocard:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.ocard .on { font-family: var(--f-display); font-weight: 700; font-size: 1.1rem; display: flex; justify-content: space-between; gap: 6px; }
+.ocard .kv { display: flex; flex-direction: column; gap: 0; font-size: .8rem; color: var(--muted); }
+.ocard .kv b { font-size: 1rem; }
+.ocard .kv b { color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ocard .kv b.neg { color: var(--late); }
+details.arrd > summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+details.arrd > summary::-webkit-details-marker { display: none; }
+details.arrd > summary::after { content: '▾'; color: var(--accent); font-weight: 700; }
+details.arrd[open] > summary::after { content: '▴'; }
+details.arrd[open] > summary { margin-bottom: 12px; }
+details.arrd .arrbody { display: flex; flex-direction: column; gap: 12px; }
 .qbtn { display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 10px; padding: 14px 12px; min-height: 98px; border-radius: 14px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit; font-weight: 700; font-size: .98rem; line-height: 1.2; cursor: pointer; text-align: left; }
 .qbtn svg { color: var(--accent); }
 .empty { color: var(--muted); margin: 0; }
@@ -165,7 +182,8 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); ou
 .fotoav { display: flex; gap: 12px; align-items: center; }
 .fotoav img { width: 72px; height: 72px; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); }
 @media (prefers-reduced-motion: no-preference) { .toast { animation: up .18s ease-out; } @keyframes up { from { transform: translate(-50%, 8px); opacity: 0; } } }
-@media (max-width: 360px) { .quick { grid-template-columns: 1fr; } .qbtn { min-height: 64px; flex-direction: row; align-items: center; justify-content: flex-start; } }
+@media (max-width: 360px) { .quick { grid-template-columns: repeat(2, minmax(0, 1fr)); } .obras { grid-template-columns: 1fr; } }
+.qbtn { min-height: 84px; padding: 12px 10px; font-size: .92rem; }
 
 :root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
 html, body { margin: 0; }
@@ -190,12 +208,15 @@ img { max-width: 100%; }
   <section id="v-hoy" aria-labelledby="h-hoy" style="display:flex;flex-direction:column;gap:18px">
     <div><h2 id="h-hoy">Tu día</h2><p class="sub" id="hoy-resumen">Cargando pendientes…</p></div>
     <div class="quick">
-      <button class="qbtn" type="button" data-go="gasto"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Registrar gasto</button>
-      <button class="qbtn" type="button" data-go="pendiente"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>Anotar pendiente</button>
-      <button class="qbtn" type="button" data-go="cuadrilla"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 19c.8-3.4 3.2-5 6-5s5.2 1.6 6 5"/><path d="M15.5 14.2c2.3-.3 4.4 1 5.2 4"/></svg>Pasar lista</button>
+      <button class="qbtn" type="button" data-go="gasto"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Gasto</button>
+      <button class="qbtn" type="button" data-go="pendiente"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>Pendiente</button>
+      <button class="qbtn" type="button" data-go="cuadrilla"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 19c.8-3.4 3.2-5 6-5s5.2 1.6 6 5"/><path d="M15.5 14.2c2.3-.3 4.4 1 5.2 4"/></svg>Lista</button>
+      <button class="qbtn" type="button" id="q-avance"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16"/><path d="M7 20v-6"/><path d="M12 20V9"/><path d="M17 20V5"/></svg>Avance</button>
     </div>
-    <div class="card arr" id="hoy-arr" hidden></div>
     <div class="card" id="hoy-pend" aria-live="polite"><p class="empty">Cargando pendientes…</p></div>
+    <div class="card" id="hoy-dinero" hidden></div>
+    <div id="hoy-obras-w" hidden style="display:flex;flex-direction:column;gap:8px"><span class="label">Obras</span><div class="obras" id="hoy-obras"></div><p class="hint" id="hoy-mfor" style="margin:0"></p></div>
+    <details class="card arr arrd" id="hoy-arr" hidden></details>
     <div class="card">
       <div class="label">En espera de pasar a los tableros</div>
       <div id="hoy-bandeja"><p class="empty">Nada en la bandeja.</p></div>
@@ -432,7 +453,7 @@ img { max-width: 100%; }
     try {
       const tree = await gh('/git/trees/main?recursive=1');
       const limite = addDays(dayKey(new Date()), -45).replace(/-/g, '');
-      const want = (tree.tree || []).filter(n => n.type === 'blob' && (/^pendientes\/.+\.json$/.test(n.path) || /^cuadrilla\.json$/.test(n.path) || /^revision\.json$/.test(n.path) ||
+      const want = (tree.tree || []).filter(n => n.type === 'blob' && (/^pendientes\/.+\.json$/.test(n.path) || /^cuadrilla\.json$/.test(n.path) || /^revision\.json$/.test(n.path) || /^resumen\.json$/.test(n.path) ||
         (/^asistencia\/(semana-)?\d{4}-\d{2}-\d{2}.*\.json$/.test(n.path) && n.path.replace(/^asistencia\/(semana-)?/, '').slice(0, 10).replace(/-/g, '') >= limite) ||
         (/^gastos\/g-(\d{8}).*\.json$/.test(n.path) && n.path.slice(9, 17) >= limite) ||
         /^obra\/[a-z0-9-]+\.json$/.test(n.path) || (/^avance\/a-(\d{8}).*\.json$/.test(n.path) && n.path.slice(9, 17) >= limite)));
@@ -455,6 +476,7 @@ img { max-width: 100%; }
     S.av = v.filter(([p]) => p.startsWith('avance/')).map(([, x]) => x.data);
     S.crew = (CACHE['cuadrilla.json'] && CACHE['cuadrilla.json'].data.personas) || [];
     S.revision = CACHE['revision.json'] && CACHE['revision.json'].data;
+    S.resumen = CACHE['resumen.json'] && CACHE['resumen.json'].data;
     const ak = Object.keys(CACHE).filter(p => p.startsWith('arranque/')).sort().pop();
     S.arranque = ak ? CACHE[ak].data : null;
   }
@@ -523,6 +545,7 @@ img { max-width: 100%; }
     window.scrollTo(0, 0);
   }
   document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => show(b.dataset.go)));
+  $('#q-avance').addEventListener('click', () => { show('obra'); if (obraDat()) { A.fecha = dayKey(new Date()); initCaptura(); } });
   function renderAll() { renderHoy(); if (!$('#v-obra').hidden && !$('#o-a').hidden) renderObra(); if (!$('#v-cuadrilla').hidden) { if (!C.touched) C.docKey = null; loadCuadrilla(); } }
 
   // ---------- conexión con GitHub (una sola vez) ----------
@@ -556,7 +579,7 @@ img { max-width: 100%; }
     if (!a || !a.fecha) { box.hidden = true; return; }
     const kids = [];
     const f = new Date(a.fecha + 'T12:00:00-06:00');
-    kids.push(el('div', { class: 'blk' }, el('div', { class: 'label' }, 'Arranque de semana · ' + (a.obra || '')),
+    const head = el('summary', {}, el('div', {}, el('div', { class: 'label' }, 'Arranque de semana · ' + (a.obra || '')),
       el('h3', {}, [a.semana, a.periodo].filter(Boolean).join(' · ') || ('Semana del ' + fDia.format(f)))));
     const acts = Array.isArray(a.actividades) ? a.actividades : [];
     if (acts.length) kids.push(el('div', { class: 'blk' }, el('div', { class: 'flabel' }, 'Cómo va la obra'),
@@ -581,13 +604,49 @@ img { max-width: 100%; }
       kids.push(el('div', { class: 'blk' }, el('div', { class: 'flabel' }, 'Mensaje de WhatsApp'), el('pre', {}, a.mensaje_whatsapp), b));
     }
     if (a.creado) kids.push(el('p', { class: 'hint', style: 'margin:0' }, 'Lo armó Claude el ' + fDia.format(new Date(a.creado)) + ' · ' + fHora.format(new Date(a.creado))));
-    box.replaceChildren(...kids); box.hidden = false;
+    box.replaceChildren(head, el('div', { class: 'arrbody' }, ...kids)); box.hidden = false;
   }
+  // ---------- tablero en Hoy: dinero y obras ----------
+  function nominaSemana() {
+    const lunes = lunesDe(dayKey(new Date())), sab = addDays(lunes, 5), docs = asisDocs(), por = {};
+    docs.filter(a => a.tipo === 'semana' && a.semana_inicio === lunes).forEach(a => por[a.obra] = +a.total || 0);
+    docs.filter(a => a.tipo !== 'semana' && a.fecha >= lunes && a.fecha <= sab && !(a.obra in por)).forEach(a => {
+      por['_' + a.obra] = (por['_' + a.obra] || 0) + (a.personas || []).reduce((t, p) => t + (+p.jornada || 0) * (+p.tarifa || TARIFA), 0); });
+    Object.keys(por).filter(k => k[0] === '_').forEach(k => { if (!(k.slice(1) in por)) por[k.slice(1)] = por[k]; delete por[k]; });
+    return { sab, por, total: Object.values(por).reduce((t, v) => t + v, 0) };
+  }
+  function renderTablero() {
+    const r = S.resumen, nm = nominaSemana();
+    const dn = $('#hoy-dinero'), ow = $('#hoy-obras-w');
+    if (!r && !nm.total) { dn.hidden = true; ow.hidden = true; return; }
+    const obras = (r && r.obras) || [];
+    const cob = obras.filter(o => +o.por_cobrar_ahora > 0), totCob = cob.reduce((t, o) => t + +o.por_cobrar_ahora, 0);
+    const kids = [el('div', { class: 'dn-big' }, el('span', { class: 'label' }, 'Por cobrar ahora'), el('b', null, money(totCob)))];
+    const bor = (r && r.borradores) || [];
+    cob.forEach(o => { const b = bor.find(x => x.obra === o.obra);
+      kids.push(el('div', { class: 'brow' }, el('span', null, (o.nombre || o.obra) + ' ', b ? el('span', { class: 'pill warn' }, (b.numero ? b.numero + ' ' : '') + 'por revisar') : ''), el('span', { class: 'r' }, money(o.por_cobrar_ahora)))); });
+    kids.push(el('div', { class: 'brow' }, el('span', null, el('b', null, 'Nómina del ' + fDia.format(dateOnly(nm.sab))), Object.keys(nm.por).length ? el('span', { class: 'hint', style: 'display:block' }, Object.entries(nm.por).map(([o, v]) => o + ' ' + money(v)).join(' · ')) : el('span', { class: 'hint', style: 'display:block' }, 'Todavía sin lista de esta semana')), el('span', { class: 'r' }, money(nm.total))));
+    dn.replaceChildren(...kids); dn.hidden = false;
+    if (!obras.length) { ow.hidden = true; return; }
+    const pctOf = o => o.obra === 'El Naranjal' && obraDat() ? pond(acts()) : o.avance;
+    $('#hoy-obras').replaceChildren(...obras.map(o => {
+      const av = pctOf(o), go = o.obra === 'El Naranjal';
+      const body = [el('div', { class: 'on' }, el('span', null, o.nombre || o.obra), av != null ? el('span', null, Math.round(av * 100) + '%') : el('span', { class: 'hint' }, o.tipo === 'diseño' ? 'diseño' : '')),
+        av != null ? el('div', { class: 'bar', 'aria-hidden': 'true' }, el('i', { style: 'width:' + Math.round(av * 100) + '%' })) : '',
+        o.por_cobrar_ahora != null ? el('div', { class: 'kv' }, el('span', null, 'Por cobrar ahora'), el('b', null, money(o.por_cobrar_ahora))) : '',
+        o.margen_al_dia != null ? el('div', { class: 'kv' }, el('span', null, 'Margen al día'), el('b', { class: o.margen_al_dia < 0 ? 'neg' : null }, money(o.margen_al_dia))) : '',
+        o.nota ? el('div', { class: 'kv' }, el('span', null, o.nota)) : ''];
+      return go ? el('button', { type: 'button', class: 'ocard', onclick: () => show('obra'), 'aria-label': (o.nombre || o.obra) + ', ver avance' }, ...body) : el('div', { class: 'ocard' }, ...body);
+    }));
+    $('#hoy-mfor').textContent = (r && r.formula_margen ? r.formula_margen : '') + (r && r.actualizado ? ' Datos del ' + fDia.format(new Date(r.actualizado)) + ' · ' + fHora.format(new Date(r.actualizado)) : '');
+    ow.hidden = false; ow.style.display = 'flex';
+  }
+  const H = { todos: false };
   function renderHoy() {
-    renderArranque();
+    renderArranque(); renderTablero();
     $('#hoy-fecha').textContent = cap(fLargo.format(new Date()));
     const rv = S.revision && S.revision.at ? new Date(S.revision.at) : null;
-    $('#hoy-rev').textContent = rv ? 'Claude revisó por última vez ' + (dayKey(rv) === dayKey(new Date()) ? 'hoy a las ' + fHora.format(rv) : fDia.format(rv) + ' · ' + fHora.format(rv)) + '. Revisa a las 2:10 p.m. y a las 11:10 p.m.' : 'Claude revisa a las 2:10 p.m. y a las 11:10 p.m.';
+    $('#hoy-rev').textContent = (rv ? 'Claude revisó por última vez ' + (dayKey(rv) === dayKey(new Date()) ? 'hoy a las ' + fHora.format(rv) : fDia.format(rv) + ' · ' + fHora.format(rv)) + '. Revisa a las 2:10 p.m. y a las 11:10 p.m.' : 'Claude revisa a las 2:10 p.m. y a las 11:10 p.m.').replace('..', '.');
     const box = $('#hoy-pend');
     if (!S.synced && !Object.keys(CACHE).length) { box.replaceChildren(el('p', { class: 'empty' }, S.online ? 'Cargando pendientes…' : 'Sin señal. Cuando haya internet aparecen tus pendientes.')); }
     else {
@@ -597,7 +656,13 @@ img { max-width: 100%; }
       const nHoy = (by.today || []).filter(r => r.p.estado === 'abierto').length, nLate = (by.late || []).filter(r => r.p.estado === 'abierto').length;
       $('#hoy-resumen').textContent = nHoy || nLate ? `Hoy tienes ${nHoy} pendiente${nHoy === 1 ? '' : 's'}` + (nLate ? ` y ${nLate} atrasado${nLate === 1 ? '' : 's'}.` : '.') : 'No tienes pendientes para hoy.';
       if (!rows.length) box.replaceChildren(el('p', { class: 'empty' }, 'Sin pendientes abiertos. Anota uno con el botón de arriba.'));
-      else box.replaceChildren(...[['late', 'Atrasados'], ['today', 'Hoy'], ['tom', 'Mañana'], ['next', 'Próximos'], ['nodate', 'Sin fecha']].filter(([g]) => by[g]).map(([g, lab]) => el('div', { class: 'group' },
+      else {
+      const urg = (by.late || []).length + (by.today || []).length;
+      const grupos = [['late', 'Atrasados'], ['today', 'Hoy'], ['tom', 'Mañana'], ['next', 'Próximos'], ['nodate', 'Sin fecha']].filter(([g]) => by[g]);
+      let vis = grupos;
+      if (!H.todos) { vis = urg ? grupos.filter(([g]) => g === 'late' || g === 'today') : grupos.slice(0, 1).map(([g, l]) => [g, 'Lo próximo']); if (!urg) by[vis[0][0]] = by[vis[0][0]].slice(0, 2); }
+      const extra = rows.length - vis.reduce((t, [g]) => t + by[g].length, 0);
+      box.replaceChildren(...vis.map(([g, lab]) => el('div', { class: 'group' },
         el('div', { class: 'label' + (g === 'late' ? ' late' : '') }, lab),
         by[g].map(({ p, t }) => {
           const done = p.estado !== 'abierto';
@@ -606,7 +671,8 @@ img { max-width: 100%; }
             el('button', { type: 'button', class: 'check', 'aria-pressed': String(done), 'aria-label': (done ? 'Volver a abrir: ' : 'Marcar como hecho: ') + p.texto, onclick: () => toggleDone(p) }, CHECK_SVG()),
             el('div', { class: 'itext' }, el('p', null, p.texto), el('div', { class: 'meta' }, when ? el('span', { class: g === 'late' ? 'late' : null }, when) : null, p.obra ? el('span', null, p.obra) : null,
               p._cola ? el('span', { class: 'pill off' }, 'por enviar') : (!done && !p.tarea_id && t && t > now ? el('span', { class: 'pill' }, 'aviso en la próxima revisión') : null))));
-        }))));
+        }))), (extra > 0 || H.todos) ? el('button', { type: 'button', class: 'linkbtn', onclick: () => { H.todos = !H.todos; renderHoy(); } }, H.todos ? 'Ver sólo lo urgente' : 'Ver todos (' + rows.length + ')') : '');
+      }
     }
     const bq = S.queue.filter(i => i.tipo === 'gasto' || i.tipo === 'avance' || (i.tipo === 'json' && i.path.startsWith('asistencia/')));
     const qPaths = new Set(bq.map(i => i.path));
